@@ -1,0 +1,1 @@
+# Self-Hosted Infrastructure (DevOps)\n\nThis repository documents a secure self-hosted infrastructure project using Docker, NGINX, and Cloudflare Tunnel.\n\nThe goal is to demonstrate real-world DevOps practices, security-first networking, and production-style workflows on bare metal.
