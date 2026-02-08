@@ -13,7 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show working directory (debug)
+        run: |
+          pwd
+          ls -la
+
       - name: Validate repository structure
+        working-directory: ${{ github.workspace }}
         run: |
           test -d docs
           test -d templates
