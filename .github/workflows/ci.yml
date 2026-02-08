@@ -1,0 +1,25 @@
+name: Infrastructure CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure
+        run: |
+          test -d docs
+          test -d templates
+          test -d nginx
+          test -f README.md
+
+      - name: CI status
+        run: echo "Infrastructure validation passed"
+
