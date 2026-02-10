@@ -56,3 +56,14 @@ infra-self-hosted/
 │   └── workflows/
 └── README.md
 
+## Deployment
+
+This project uses a pull-based deployment model.
+
+The server runs NGINX in Docker with the site directory mounted read-only.  
+Updates are deployed by pulling the latest changes from GitHub.
+
+To deploy updates on the server:
+
+```bash
+./deploy
