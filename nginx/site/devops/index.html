@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevOps Lab — j-kano.site</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="wrap">
+    <header>
+      <a href="/">← j-kano</a>
+      <span class="brand">DevOps Lab</span>
+    </header>
+
+    <div id="progress-wrap">
+      <div class="progress-text" id="progress-text">0 / 0 lessons</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="mode-tabs">
+      <button type="button" id="btn-mode-learn" class="active">Learn</button>
+      <button type="button" id="btn-mode-quiz">Quiz</button>
+    </div>
+
+    <ul class="modules" id="module-list"></ul>
+
+    <div id="view-learn" class="view-learn">
+      <div class="lesson-nav" id="lesson-nav"></div>
+      <article class="lesson">
+        <h2 id="lesson-title"></h2>
+        <div class="lesson-content" id="lesson-content"></div>
+      </article>
+    </div>
+
+    <div id="view-quiz" class="view-quiz">
+      <div id="quiz-container"></div>
+      <div id="results-container" style="display:none" class="results">
+        <h2>Quiz results</h2>
+        <div class="score" id="results-score"></div>
+        <p class="weak" id="results-weak"></p>
+      </div>
+      <div class="buttons">
+        <button type="button" class="btn" id="btn-submit-quiz">Submit</button>
+      </div>
+    </div>
+
+    <div class="reset-wrap">
+      <button type="button" class="btn btn-pink" id="btn-reset">Reset progress</button>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

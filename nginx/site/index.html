@@ -199,6 +199,39 @@
       font-size:12px;
       color: rgba(233,236,255,.45);
     }
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+      margin:20px 0 24px;
+    }
+    @media (max-width: 640px){ .stats{ grid-template-columns: repeat(2, 1fr) } }
+    .stat{
+      text-align:center;
+      padding:14px 10px;
+      border:1px solid var(--stroke);
+      border-radius:12px;
+      background: rgba(0,0,0,.25);
+    }
+    .stat b{ display:block; font-size:22px; color:var(--cyan); text-shadow:0 0 12px rgba(0,255,255,.3); margin-bottom:4px; }
+    .stat span{ font-size:12px; color:var(--muted); }
+    .progress-wrap{ margin:24px 0; }
+    .progress-title{ font-size:12px; color:var(--muted); margin-bottom:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .timeline{ position:relative; padding-left:20px; border-left:2px solid var(--stroke); margin-left:8px; }
+    .timeline .item{ position:relative; padding-bottom:18px; }
+    .timeline .item:last-child{ padding-bottom:0; }
+    .timeline .item::before{ content:""; position:absolute; left:-26px; top:6px; width:10px; height:10px; border-radius:99px; background:var(--cyan); box-shadow:0 0 12px rgba(0,255,255,.5); }
+    .timeline .item.done::before{ background:var(--green); box-shadow:0 0 12px rgba(0,255,136,.5); }
+    .timeline .item h4{ margin:0 0 4px 0; font-size:14px; letter-spacing:.06em; }
+    .timeline .item p{ margin:0; font-size:12px; color:var(--muted); }
+    .section{ border:1px solid var(--stroke); border-radius:14px; margin-top:14px; background: rgba(0,0,0,.2); overflow:hidden; }
+    .section-head{ padding:14px 18px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:12px; user-select:none; }
+    .section-head:hover{ background: rgba(255,255,255,.03); }
+    .section-head strong{ font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+    .section-head .chevron{ transition: transform .2s ease; font-size:12px; color:var(--muted); }
+    .section.open .section-head .chevron{ transform: rotate(90deg); }
+    .section-body{ display:none; padding:0 18px 18px; }
+    .section.open .section-body{ display:block; }
     /* custom cursor glow */
     body{
       cursor: none;
@@ -256,29 +289,66 @@
     </div>
 
     <div class="hero">
-      <h1>Projects in Motion</h1>
-      <p>Dark neon homepage that links to everything we build. Two playable demos are live right now. More coming.</p>
+      <h1>Joseph Kano</h1>
+      <p>DevOps, automation, and things that ship. This site is the hub—games, labs, and progress live here.</p>
+
+      <div class="stats">
+        <div class="stat"><b id="stat-containers">—</b><span>Containers deployed</span></div>
+        <div class="stat"><b id="stat-scripts">—</b><span>Scripts written</span></div>
+        <div class="stat"><b id="stat-labs">—</b><span>Labs completed</span></div>
+        <div class="stat"><b id="stat-uptime">—</b><span>Uptime goals</span></div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-title">DevOps journey</div>
+        <div class="timeline" id="timeline"></div>
+      </div>
 
       <div class="grid" id="grid">
+        <div class="card" style="--accent: var(--green);">
+          <a class="btn" href="/devops/index.html">
+            <div class="titleRow">
+              <strong>DevOps Lab</strong>
+              <span class="pill">learn</span>
+            </div>
+            <p class="desc">Interactive learning hub. Modules, quizzes, progress—all static, no backend.</p>
+          </a>
+        </div>
         <div class="card" style="--accent: var(--cyan);">
           <a class="btn" href="/snake.html">
             <div class="titleRow">
               <strong>Snake</strong>
               <span class="pill">arcade</span>
             </div>
-            <p class="desc">Fast, smooth snake with a single page load. Works on phone + desktop.</p>
+            <p class="desc">Fast, smooth snake. One page. Works on phone + desktop.</p>
           </a>
         </div>
-
         <div class="card" style="--accent: var(--pink);">
           <a class="btn" href="/game.html">
             <div class="titleRow">
               <strong>Neon Drift</strong>
               <span class="pill">mission</span>
             </div>
-            <p class="desc">Character select, short missions, drones, lasers, shards. Pure neon chaos.</p>
+            <p class="desc">Character select, missions, drones, lasers, shards. Pure neon chaos.</p>
           </a>
         </div>
+      </div>
+
+      <div class="section" data-section="projects">
+        <div class="section-head"><strong>Projects</strong><span class="chevron">›</span></div>
+        <div class="section-body"><p style="margin:0;font-size:13px;color:var(--muted);">Infra, nginx, Cloudflare, this site. Everything here is static and self-hosted.</p></div>
+      </div>
+      <div class="section" data-section="games">
+        <div class="section-head"><strong>Games</strong><span class="chevron">›</span></div>
+        <div class="section-body"><p style="margin:0;font-size:13px;color:var(--muted);"><a href="/snake.html" style="color:var(--cyan);">Snake</a> · <a href="/game.html" style="color:var(--pink);">Neon Drift</a>. Keyboard and touch. No install.</p></div>
+      </div>
+      <div class="section" data-section="devops">
+        <div class="section-head"><strong>DevOps Lab</strong><span class="chevron">›</span></div>
+        <div class="section-body"><p style="margin:0;font-size:13px;color:var(--muted);"><a href="/devops/index.html" style="color:var(--green);">Learning hub</a>—syllabus-driven lessons and quizzes. Progress saved in browser.</p></div>
+      </div>
+      <div class="section" data-section="notes">
+        <div class="section-head"><strong>Notes</strong><span class="chevron">›</span></div>
+        <div class="section-body"><p style="margin:0;font-size:13px;color:var(--muted);">Snippets and references. Coming soon.</p></div>
       </div>
 
       <div class="hint">
@@ -290,12 +360,43 @@
       </div>
 
       <div class="footer">
-        tip: bookmark /snake.html and /game.html
+        tip: bookmark /devops/, /snake.html, /game.html
       </div>
     </div>
   </div>
 
   <script>
+    // Single JSON for stats + progress timeline — update this object to refresh the page
+    const SITE_DATA = {
+      stats: { containers: 12, scripts: 24, labs: 8, uptime: "99%" },
+      timeline: [
+        { label: "Infra & self-host", detail: "nginx, Cloudflare, static site", done: true },
+        { label: "CI/CD pipeline", detail: "GitHub Actions, deploy flow", done: true },
+        { label: "DevOps Lab", detail: "Syllabus-driven lessons and quizzes", done: true },
+        { label: "Containers at scale", detail: "Orchestration, observability", done: false },
+        { label: "Security hardening", detail: "Secrets, TLS, headers", done: false }
+      ]
+    };
+
+    document.getElementById('stat-containers').textContent = SITE_DATA.stats.containers;
+    document.getElementById('stat-scripts').textContent = SITE_DATA.stats.scripts;
+    document.getElementById('stat-labs').textContent = SITE_DATA.stats.labs;
+    document.getElementById('stat-uptime').textContent = SITE_DATA.stats.uptime;
+
+    const tl = document.getElementById('timeline');
+    SITE_DATA.timeline.forEach(function (item) {
+      const div = document.createElement('div');
+      div.className = 'item' + (item.done ? ' done' : '');
+      div.innerHTML = '<h4>' + item.label + '</h4><p>' + item.detail + '</p>';
+      tl.appendChild(div);
+    });
+
+    document.querySelectorAll('.section-head').forEach(function (head) {
+      head.addEventListener('click', function () {
+        head.closest('.section').classList.toggle('open');
+      });
+    });
+
     // mouse glow cursor + hover lighting on cards
     const c = document.getElementById('c');
     const r = document.getElementById('r');

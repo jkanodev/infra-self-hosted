@@ -1,0 +1,96 @@
+:root {
+  --bg: #070812;
+  --panel: rgba(255,255,255,.04);
+  --stroke: rgba(255,255,255,.10);
+  --text: #e9ecff;
+  --muted: rgba(233,236,255,.65);
+  --cyan: #00ffff;
+  --pink: #ff00ff;
+  --green: #00ff88;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: ui-monospace, Menlo, Consolas, monospace; background: var(--bg); color: var(--text); }
+body { overflow-x: hidden; }
+a { color: var(--cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,.03) 50%, transparent 50%);
+  background-size: 100% 4px;
+  opacity: .35;
+  z-index: 100;
+}
+.wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; position: relative; z-index: 1; }
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--stroke);
+}
+header a { color: var(--text); }
+header a:hover { color: var(--cyan); text-decoration: none; }
+.brand { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 14px; }
+.progress-bar-wrap { height: 6px; background: var(--panel); border-radius: 999px; overflow: hidden; margin-bottom: 24px; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--green)); border-radius: 999px; transition: width .3s ease; width: 0%; }
+.progress-text { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.modules { list-style: none; padding: 0; margin: 0; }
+.modules li { margin-bottom: 10px; }
+.module-card {
+  display: block;
+  padding: 14px 18px;
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  background: rgba(0,0,0,.25);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.module-card:hover { border-color: rgba(0,255,255,.3); box-shadow: 0 0 20px rgba(0,255,255,.1); }
+.module-card.done { border-color: rgba(0,255,136,.25); }
+.module-card .ring { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--stroke); border-radius: 50%; margin-right: 12px; vertical-align: middle; }
+.module-card.done .ring { border-color: var(--green); background: rgba(0,255,136,.2); }
+.module-card .title { font-weight: 700; font-size: 14px; letter-spacing: .06em; }
+.module-card .meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.view-learn, .view-quiz { display: none; }
+.view-learn.active, .view-quiz.active { display: block; }
+.lesson-nav { margin-bottom: 16px; font-size: 13px; color: var(--muted); }
+.lesson-nav a { color: var(--cyan); }
+.lesson h2 { font-size: 18px; letter-spacing: .06em; margin: 0 0 12px; }
+.lesson .content { line-height: 1.7; color: var(--muted); font-size: 14px; }
+.lesson .content p { margin: 0 0 12px; }
+.quiz-q { margin-bottom: 24px; padding: 16px; border: 1px solid var(--stroke); border-radius: 12px; background: rgba(0,0,0,.2); }
+.quiz-q h3 { font-size: 14px; margin: 0 0 12px; font-weight: 600; }
+.quiz-q ul { list-style: none; padding: 0; margin: 0; }
+.quiz-q li { margin: 8px 0; }
+.quiz-q label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px 0; }
+.quiz-q input { accent-color: var(--cyan); }
+.results { text-align: center; padding: 24px 0; }
+.results h2 { font-size: 22px; margin-bottom: 8px; }
+.results .score { font-size: 32px; color: var(--green); margin: 12px 0; }
+.results .weak { font-size: 13px; color: var(--muted); margin-top: 16px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.btn {
+  padding: 12px 20px;
+  border: 1px solid rgba(0,255,255,.35);
+  background: transparent;
+  color: var(--cyan);
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.btn:hover { background: rgba(0,255,255,.1); }
+.btn.pink { border-color: rgba(255,0,255,.35); color: var(--pink); }
+.btn.pink:hover { background: rgba(255,0,255,.1); }
+.mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.mode-tabs button { padding: 10px 16px; border: 1px solid var(--stroke); background: var(--panel); color: var(--muted); font-family: inherit; border-radius: 8px; cursor: pointer; font-size: 13px; }
+.mode-tabs button.active { border-color: var(--cyan); color: var(--cyan); }
+.reset-wrap { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--stroke); }
+.reset-wrap .btn { font-size: 12px; color: var(--muted); border-color: var(--stroke); }
