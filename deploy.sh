@@ -4,7 +4,7 @@ set -euo pipefail
 # Overridable vars
 IMAGE="${IMAGE:-ghcr.io/jkanodev/infra-self-hosted:latest}"
 CONTAINER_NAME="${CONTAINER_NAME:-portfolio}"
-PORT="${PORT:-8080}"
+PORT="${PORT:-80}"
 
 echo "Starting deploy..."
 echo "IMAGE=$IMAGE"
