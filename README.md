@@ -67,3 +67,4 @@ To deploy updates on the server:
 
 ```bash
 ./deploy
+# trigger
