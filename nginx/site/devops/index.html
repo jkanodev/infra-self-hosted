@@ -13,6 +13,52 @@
       <a href="/">← j-kano</a>
       <span class="brand">DevOps Lab</span>
     </header>
+    <section class="k8s-exec" style="margin:18px 0 22px; padding:14px 14px; border:1px solid rgba(255,255,255,.10); border-radius:14px; background: rgba(0,0,0,.28);">
+      <h2 style="margin:0 0 10px; letter-spacing:.06em; text-transform:uppercase;">Kubernetes and DevOps Execution</h2>
+
+      <div style="display:grid; gap:12px;">
+        <div>
+          <h3 style="margin:0 0 6px; font-size:14px; opacity:.9;">Section 0 — Cluster Foundations</h3>
+          <ul style="margin:0; padding-left:18px; opacity:.8; line-height:1.6;">
+            <li>Operated a multi-node Kind cluster: 1 control plane, 2 workers</li>
+            <li>Validated node health and cluster state using kubectl</li>
+            <li>Deployed workloads via Deployments and Services</li>
+            <li>Tested ClusterIP vs NodePort and traced traffic paths</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 6px; font-size:14px; opacity:.9;">Section 1 — Workloads and Reconciliation</h3>
+          <ul style="margin:0; padding-left:18px; opacity:.8; line-height:1.6;">
+            <li>Verified desired vs actual state reconciliation behavior</li>
+            <li>Observed ReplicaSet enforcement via controlled pod deletion</li>
+            <li>Executed rolling updates and rollbacks</li>
+            <li>Scaled replicas to observe controller loop behavior</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 6px; font-size:14px; opacity:.9;">Section 2 — Scheduler and Multi-Node Behavior</h3>
+          <ul style="margin:0; padding-left:18px; opacity:.8; line-height:1.6;">
+            <li>Deployed ~50 replicas and inspected placement with kubectl get pods -o wide</li>
+            <li>Simulated maintenance using kubectl drain and observed eviction and rescheduling</li>
+            <li>Restored scheduling via kubectl uncordon</li>
+            <li>Forced deterministic placement using nodeSelector constraints</li>
+            <li>Confirmed scheduler does not auto-rebalance existing pods</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 6px; font-size:14px; opacity:.9;">Section 3 — ConfigMaps and Runtime Config</h3>
+          <ul style="margin:0; padding-left:18px; opacity:.8; line-height:1.6;">
+            <li>Created ConfigMap web-config with APP_MODE=prod</li>
+            <li>Injected config into Deployment using kubectl set env --from=configmap</li>
+            <li>Verified inside containers using printenv and grep APP_MODE</li>
+            <li>Compared env injection vs mounted config behavior</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
     <div id="progress-wrap">
       <div class="progress-text" id="progress-text">0 / 0 lessons</div>
