@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creative Lab — Joseph Kano</title>
+  <meta name="description" content="Interactive builds: browser games and UI experiments. Interaction design and implementation clarity." />
+  <style>
+    :root {
+      --bg-primary: #0b0f14;
+      --bg-secondary: #101826;
+      --surface: #0f172a;
+      --text-primary: #e5e7eb;
+      --text-secondary: #94a3b8;
+      --accent: #3b82f6;
+      --border: rgba(148, 163, 184, 0.18);
+      --max-width: 1100px;
+      --section-py: 72px;
+      --gap: 24px;
+      --radius: 14px;
+      --font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); font-size: 16px; line-height: 1.6; background: var(--bg-primary); color: var(--text-primary); }
+    .wrap { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+    .back { display: inline-block; margin-bottom: 32px; color: var(--text-secondary); text-decoration: none; font-size: 15px; }
+    .back:hover { color: var(--accent); }
+    h1 { font-size: 28px; font-weight: 600; margin: 0 0 16px; }
+    h2 { font-size: 20px; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary); }
+    p { margin: 0 0 16px; color: var(--text-secondary); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .lab-intro { padding-top: 48px; padding-bottom: 24px; max-width: 640px; }
+    .lab-list { list-style: none; padding: 0; margin: 0; }
+    .lab-list li { margin-bottom: 16px; }
+    .lab-list a {
+      display: block;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: border-color 0.15s ease;
+    }
+    .lab-list a:hover { border-color: var(--accent); text-decoration: none; }
+    .lab-list strong { display: block; font-size: 17px; margin-bottom: 6px; }
+    .lab-list span { font-size: 15px; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="/" class="back">← Portfolio</a>
+
+    <section class="lab-intro">
+      <h1>Creative Lab</h1>
+      <p>A curated set of interactive builds including browser-based games and UI experiments. These projects focus on interaction design, responsiveness, and implementation clarity.</p>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <ul class="lab-list">
+        <li>
+          <a href="/lab/snake.html">
+            <strong>Snake</strong>
+            <span>Browser-based game focused on input responsiveness and clean rendering loop.</span>
+          </a>
+        </li>
+        <li>
+          <a href="/lab/neon-drift.html">
+            <strong>Neon Drift</strong>
+            <span>Arcade-style concept exploring motion feel and lightweight visual effects under performance constraints.</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>

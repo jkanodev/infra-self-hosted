@@ -1,35 +1,19 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# Run on the server to pull the latest image and restart the container.
+# Also invoked by GitHub Actions via SSH after build-and-push.
+set -e
 
-# Overridable vars
 IMAGE="${IMAGE:-ghcr.io/jkanodev/infra-self-hosted:latest}"
-CONTAINER_NAME="${CONTAINER_NAME:-portfolio}"
+CONTAINER_NAME="${CONTAINER_NAME:-portfolio-web}"
 PORT="${PORT:-80}"
 
-echo "Starting deploy..."
-echo "IMAGE=$IMAGE"
-echo "CONTAINER_NAME=$CONTAINER_NAME"
-echo "PORT=$PORT"
-
-# Pull latest image
-echo "Pulling image..."
+echo "Pulling $IMAGE..."
 docker pull "$IMAGE"
 
-# Stop/remove old container if it exists
-if docker ps -a --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
-  echo "Stopping existing container..."
-  docker stop "$CONTAINER_NAME" || true
-  echo "Removing existing container..."
-  docker rm "$CONTAINER_NAME" || true
-fi
-
-# Run new container
-echo "Starting new container..."
-docker run -d \
-  --name "$CONTAINER_NAME" \
-  --restart unless-stopped \
-  -p "$PORT:80" \
-  "$IMAGE"
+echo "Replacing container..."
+docker stop "$CONTAINER_NAME" 2>/dev/null || true
+docker rm "$CONTAINER_NAME" 2>/dev/null || true
+docker run -d --name "$CONTAINER_NAME" --restart unless-stopped -p "${PORT}:80" "$IMAGE"
 
 echo "Deploy complete."
 docker ps --filter "name=$CONTAINER_NAME"

@@ -1,0 +1,26 @@
+{
+  "title": "Part 2 — Act 3",
+  "slug": "part-2-act-3",
+  "modules": [
+    {
+      "id": "m3",
+      "title": "CI/CD",
+      "lessons": [
+        { "id": "l5", "title": "Continuous Integration", "content": "CI runs tests on every commit. Build, test, report. Catch breakage before merge." },
+        { "id": "l6", "title": "Deployment pipelines", "content": "CD automates deploy after green build. Stages: build → test → deploy. Use secrets for credentials." }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Observability",
+      "lessons": [
+        { "id": "l7", "title": "Logs and metrics", "content": "Logs are events; metrics are numbers over time. Centralize logs. Track latency, errors, throughput." },
+        { "id": "l8", "title": "Alerts", "content": "Alert on symptoms, not causes. Set thresholds. Avoid alert fatigue with good grouping and runbooks." }
+      ]
+    }
+  ],
+  "quiz": [
+    { "question": "CI typically runs on _____?", "options": ["Manual trigger only", "Every commit", "Weekly schedule"], "correct": 1 },
+    { "question": "Good alerts focus on _____?", "options": ["Root causes only", "Symptoms and impact", "Every metric change"], "correct": 1 }
+  ]
+}

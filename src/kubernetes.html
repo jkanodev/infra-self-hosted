@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kubernetes & DevOps Engineering — Joseph Kano</title>
+  <meta name="description" content="Hands-on Kubernetes execution: cluster foundations, workloads, scheduler, configuration management." />
+  <style>
+    :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+    h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 8px; }
+    h2 { font-size: 1.2rem; font-weight: 600; margin: 32px 0 12px; color: var(--text); }
+    h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; color: var(--muted); }
+    p { margin: 0 0 12px; color: var(--muted); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul { margin: 0 0 16px; padding-left: 1.5em; color: var(--muted); }
+    li { margin-bottom: 6px; }
+    hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
+    .nav { margin-bottom: 24px; font-size: 14px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; margin-right: 6px; }
+    .badge-done { background: rgba(63, 185, 80, .2); color: var(--green); }
+    .badge-progress { background: rgba(210, 153, 34, .2); color: var(--yellow); }
+    .badge-start { background: rgba(88, 166, 255, .15); color: var(--accent); }
+    pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; color: var(--muted); margin: 12px 0; }
+    code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav"><a href="/">← Portfolio</a></nav>
+
+    <h1>Kubernetes & DevOps Engineering Execution</h1>
+    <p>Structured, hands-on Kubernetes execution across multi-node cluster scenarios. All experiments performed on a multi-node Kind cluster with direct runtime validation using kubectl and container inspection.</p>
+
+    <h2>Kubernetes Master Roadmap Progress</h2>
+
+    <h3><span class="badge badge-done">Completed</span> Section 0 — Cluster Foundations</h3>
+    <ul>
+      <li>Provisioned and operated a multi-node Kind cluster (1 control plane, 2 worker nodes)</li>
+      <li>Validated node health and overall cluster state using kubectl</li>
+      <li>Deployed containerized workloads via Deployments and Services</li>
+      <li>Configured and tested ClusterIP and NodePort networking models</li>
+      <li>Analyzed internal DNS resolution and service-to-service routing</li>
+    </ul>
+
+    <hr />
+
+    <h3><span class="badge badge-done">Completed</span> Section 1 — Workloads & Reconciliation</h3>
+    <ul>
+      <li>Executed deployments and validated Kubernetes desired vs actual state reconciliation</li>
+      <li>Observed ReplicaSet enforcement through controlled pod deletion and automatic recreation</li>
+      <li>Performed rolling updates and rollbacks to validate release behavior</li>
+      <li>Scaled workloads to analyze controller loop reactions to replica changes</li>
+      <li>Verified self-healing characteristics through intentional workload disruption</li>
+    </ul>
+
+    <hr />
+
+    <h3><span class="badge badge-progress">In Progress</span> Section 2 — Scheduler & Multi-Node Behavior</h3>
+    <ul>
+      <li>Deployed ~50 replicas to observe scheduler distribution across worker nodes</li>
+      <li>Analyzed placement decisions using:</li>
+    </ul>
+    <pre><code>kubectl get pods -o wide</code></pre>
+    <ul>
+      <li>Simulated planned node maintenance using:</li>
+    </ul>
+    <pre><code>kubectl drain &lt;node&gt; --ignore-daemonsets --delete-emptydir-data</code></pre>
+    <ul>
+      <li>Observed controlled pod eviction and automatic rescheduling to healthy nodes</li>
+      <li>Restored scheduling capacity using:</li>
+    </ul>
+    <pre><code>kubectl uncordon &lt;node&gt;</code></pre>
+    <ul>
+      <li>Enforced deterministic placement using nodeSelector constraints</li>
+      <li>Triggered fresh scheduling decisions via rollout restart</li>
+      <li>Confirmed Kubernetes does not automatically rebalance existing pods</li>
+    </ul>
+
+    <hr />
+
+    <h3><span class="badge badge-start">Started</span> Section 3 — Configuration Management</h3>
+    <ul>
+      <li>Created runtime configuration using ConfigMaps:</li>
+    </ul>
+    <pre><code>kubectl create configmap web-config --from-literal=APP_MODE=prod</code></pre>
+    <ul>
+      <li>Injected configuration into running workloads:</li>
+    </ul>
+    <pre><code>kubectl set env deployment/web --from=configmap/web-config</code></pre>
+    <ul>
+      <li>Verified environment injection inside live containers:</li>
+    </ul>
+    <pre><code>kubectl exec -it &lt;pod&gt; -- printenv | grep APP_MODE</code></pre>
+    <ul>
+      <li>Demonstrated separation of container image and runtime configuration</li>
+      <li>Compared environment-variable injection vs mounted configuration behavior</li>
+      <li>Initiated Secret-based configuration for sensitive data handling</li>
+    </ul>
+
+    <h2>Practical Engineering Scenarios Executed</h2>
+
+    <h3>Multi-Node Scheduling & Resilience</h3>
+    <ul>
+      <li>Validated scheduler distribution under replica load</li>
+      <li>Simulated node maintenance and failure scenarios</li>
+      <li>Observed ReplicaSet-driven reconciliation during infrastructure disruption</li>
+      <li>Verified controller loop response to node state changes</li>
+      <li>Demonstrated explicit workload placement constraints using nodeSelector</li>
+    </ul>
+
+    <h3>Configuration Architecture Evolution</h3>
+    <ul>
+      <li>Migrated from baked configuration patterns to runtime injection model</li>
+      <li>Externalized application configuration using ConfigMaps</li>
+      <li>Verified runtime environment behavior directly inside containers</li>
+      <li>Reduced environment coupling through immutable image strategy</li>
+    </ul>
+
+    <hr />
+
+    <h2>Legacy vs Modern Configuration</h2>
+
+    <h3>Historical Model</h3>
+    <ul>
+      <li>Environment-specific builds (dev/test/prod artifacts)</li>
+      <li>File-based configuration with post-deploy transformations</li>
+      <li>Tight artifact-to-environment coupling</li>
+      <li>Operational fragility during environment promotion</li>
+    </ul>
+
+    <h3>Container-Native Model</h3>
+    <ul>
+      <li>Single immutable image across environments</li>
+      <li>Externalized configuration via ConfigMaps</li>
+      <li>Sensitive values isolated using Secrets</li>
+      <li>Runtime injection without image rebuild</li>
+      <li>Improved portability, consistency, and deployment safety</li>
+    </ul>
+
+    <p style="margin-top: 32px;"><a href="/">← Back to portfolio</a></p>
+  </div>
+</body>
+</html>

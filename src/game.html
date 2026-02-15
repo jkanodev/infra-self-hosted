@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Neon Drift — j-kano.site</title>
+  <style>
+    :root{--bg:#05060b;--cyan:#00ffff;--pink:#ff00ff;--green:#00ff88;--orange:#ff8800;--text:#e8f0ff;--muted:#94a3b8}
+    *{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none}
+    html,body{height:100%;margin:0;overflow:hidden}
+    body{background:radial-gradient(900px 600px at 20% 20%, rgba(0,255,255,.08), transparent 55%),
+                radial-gradient(900px 600px at 80% 30%, rgba(255,0,255,.06), transparent 55%),var(--bg);
+        color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace}
+    #scanlines{pointer-events:none;position:fixed;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,.02) 50%,transparent 50%);background-size:100% 4px;opacity:.4;z-index:100}
+    #c{display:block;width:100%;height:100%;background:var(--bg)}
+    #ui{position:fixed;inset:0;pointer-events:none;z-index:50;display:flex;flex-direction:column}
+    #ui>*{pointer-events:auto}
+    .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,11,.92);pointer-events:auto}
+    .screen.hide{display:none}
+    .screen h1{margin:0 0 8px;font-size:clamp(24px,5vw,42px);letter-spacing:.12em;text-transform:uppercase;text-shadow:0 0 24px rgba(0,255,255,.4)}
+    .screen .sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+    .btn{padding:14px 28px;margin:8px;border:1px solid rgba(0,255,255,.4);background:rgba(0,255,255,.08);color:var(--cyan);
+         font-family:inherit;font-size:14px;letter-spacing:.1em;text-transform:uppercase;border-radius:12px;cursor:pointer}
+    .btn:hover{background:rgba(0,255,255,.15);box-shadow:0 0 20px rgba(0,255,255,.2)}
+    .btn.pink{border-color:rgba(255,0,255,.4);background:rgba(255,0,255,.08);color:var(--pink)}
+    .chars,.missions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:520px}
+    .charCard,.missionCard{padding:16px 20px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.3);cursor:pointer;min-width:140px;text-align:center}
+    .charCard:hover,.charCard.sel,.missionCard:hover,.missionCard.sel{border-color:var(--cyan);box-shadow:0 0 16px rgba(0,255,255,.2)}
+    .charCard.sel,.missionCard.sel{background:rgba(0,255,255,.08)}
+    .charCard strong,.missionCard strong{display:block;margin-bottom:6px;font-size:14px}
+    .charCard span,.missionCard span{font-size:12px;color:var(--muted)}
+    #hud{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4)}
+    #hud .l{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--muted)}
+    #hud b{color:var(--text)}
+    #hud .alert{color:var(--orange);animation:blink 1s infinite}
+    @keyframes blink{50%{opacity:.6}}
+    #touch{position:fixed;bottom:20px;left:20px;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);pointer-events:auto;touch-action:none}
+    #touch.shoot{left:auto;right:20px;background:rgba(255,0,255,.15);border-color:rgba(255,0,255,.4)}
+    @media (min-width:769px){#touch,#touch.shoot{display:none}}
+  </style>
+</head>
+<body>
+  <div id="scanlines"></div>
+  <canvas id="c"></canvas>
+  <div id="ui">
+    <div id="screen-title" class="screen">
+      <h1>Neon Drift</h1>
+      <p class="sub">Missions. Drones. Extract.</p>
+      <button class="btn" id="btn-play">Play</button>
+      <button class="btn pink" onclick="location.href='/'">Home</button>
+    </div>
+    <div id="screen-char" class="screen hide">
+      <h1>Choose Runner</h1>
+      <div class="chars" id="chars"></div>
+      <button class="btn" id="btn-mission">Next</button>
+    </div>
+    <div id="screen-mission" class="screen hide">
+      <h1>Mission</h1>
+      <div class="missions" id="missions"></div>
+      <button class="btn" id="btn-start">Launch</button>
+    </div>
+    <div id="screen-hud" class="screen hide" style="justify-content:flex-start;align-items:stretch;padding:0">
+      <div id="hud">
+        <div class="l"><span>HP <b id="hud-hp">100</b></span><span>Shards <b id="hud-shards">0</b></span><span id="hud-goal"></span></div>
+        <div class="l"><span id="hud-alert" class="alert"></span></div>
+      </div>
+    </div>
+    <div id="screen-pause" class="screen hide">
+      <h1>Paused</h1>
+      <button class="btn" id="btn-resume">Resume</button>
+      <button class="btn pink" id="btn-quit">Quit</button>
+    </div>
+    <div id="screen-results" class="screen hide">
+      <h1 id="results-title">Mission Complete</h1>
+      <p class="sub" id="results-sub"></p>
+      <button class="btn" id="btn-again">Again</button>
+      <button class="btn pink" onclick="location.href='/'">Home</button>
+    </div>
+    <div id="touch" style="display:none" aria-label="Move stick"></div>
+    <div id="touch-shoot" class="shoot" style="display:none" aria-label="Shoot"></div>
+  </div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  let w, h, scale, offx, offy;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    scale = Math.min(w, h) / 600;
+    offx = (w - 600 * scale) / 2;
+    offy = (h - 600 * scale) / 2;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const CHAR_LIST = [
+    { id: 'nova', name: 'Nova', ability: 'Dash' },
+    { id: 'pulse', name: 'Pulse', ability: 'Shield' },
+    { id: 'blitz', name: 'Blitz', ability: 'Double shot' },
+    { id: 'flux', name: 'Flux', ability: 'Speed boost' }
+  ];
+  const MISSION_LIST = [
+    { id: 'shards', name: 'Shard Run', goal: 'Collect 8 shards', target: 8, type: 'shards' },
+    { id: 'survive', name: 'Survive', goal: 'Survive 45 seconds', target: 45, type: 'time' },
+    { id: 'extract', name: 'Extraction', goal: 'Reach extraction zone', target: 1, type: 'extract' }
+  ];
+
+  let state = 'title';
+  let charIndex = 0;
+  let missionIndex = 0;
+  let player = { x: 300, y: 300, vx: 0, vy: 0, hp: 100, maxHp: 100, r: 14, cooldown: 0, abilityCd: 0, invuln: 0 };
+  let bullets = [];
+  let enemies = [];
+  let shards = [];
+  let particles = [];
+  let extraction = null;
+  let missionStartTime = 0;
+  let shardsCollected = 0;
+  let keys = {};
+  let touchMove = { x: 0, y: 0 };
+  let alertText = '';
+  let alertUntil = 0;
+
+  function show(screenId){
+    document.querySelectorAll('.screen').forEach(el => el.classList.add('hide'));
+    const el = document.getElementById('screen-' + screenId);
+    if (el) el.classList.remove('hide');
+    state = screenId;
+  }
+
+  function setAlert(msg, sec){
+    alertText = msg;
+    alertUntil = performance.now() / 1000 + (sec || 2);
+  }
+
+  document.getElementById('btn-play').onclick = () => show('char');
+  document.getElementById('btn-mission').onclick = () => show('mission');
+  document.getElementById('btn-start').onclick = () => startMission();
+  document.getElementById('btn-resume').onclick = () => show('hud');
+  document.getElementById('btn-quit').onclick = () => { show('title'); };
+  document.getElementById('btn-again').onclick = () => { show('char'); };
+
+  document.getElementById('chars').innerHTML = CHAR_LIST.map((c, i) =>
+    '<div class="charCard' + (i === 0 ? ' sel' : '') + '" data-i="' + i + '"><strong>' + c.name + '</strong><span>' + c.ability + '</span></div>'
+  ).join('');
+  document.querySelectorAll('.charCard').forEach(el => {
+    el.onclick = () => {
+      document.querySelectorAll('.charCard').forEach(c => c.classList.remove('sel'));
+      el.classList.add('sel');
+      charIndex = +el.dataset.i;
+    };
+  });
+
+  document.getElementById('missions').innerHTML = MISSION_LIST.map((m, i) =>
+    '<div class="missionCard' + (i === 0 ? ' sel' : '') + '" data-i="' + i + '"><strong>' + m.name + '</strong><span>' + m.goal + '</span></div>'
+  ).join('');
+  document.querySelectorAll('.missionCard').forEach(el => {
+    el.onclick = () => {
+      document.querySelectorAll('.missionCard').forEach(c => c.classList.remove('sel'));
+      el.classList.add('sel');
+      missionIndex = +el.dataset.i;
+    };
+  });
+
+  function startMission(){
+    const m = MISSION_LIST[missionIndex];
+    player.x = 300; player.y = 300; player.vx = 0; player.vy = 0;
+    player.hp = player.maxHp; player.cooldown = 0; player.abilityCd = 0; player.invuln = 60;
+    bullets = []; enemies = []; shards = []; particles = []; extraction = null;
+    shardsCollected = 0;
+    missionStartTime = performance.now() / 1000;
+    document.getElementById('hud-hp').textContent = player.hp;
+    document.getElementById('hud-shards').textContent = '0';
+    document.getElementById('hud-goal').textContent = m.goal;
+    document.getElementById('hud-alert').textContent = '';
+    if (m.type === 'shards') {
+      for (let i = 0; i < 12; i++) spawnShard();
+    } else if (m.type === 'time' || m.type === 'extract') {
+      for (let i = 0; i < 6; i++) spawnShard();
+    }
+    setAlert('Go.', 1);
+    show('hud');
+    if (m.type === 'extract') {
+      setTimeout(() => {
+        extraction = { x: 300, y: 80, r: 40 };
+        setAlert('Extraction zone open!', 3);
+      }, 3000);
+    }
+    spawnEnemy();
+    loop();
+  }
+
+  function spawnShard(){
+    shards.push({
+      x: 80 + Math.random() * 440,
+      y: 80 + Math.random() * 440,
+      r: 8
+    });
+  }
+  function spawnEnemy(){
+    const side = Math.floor(Math.random() * 4);
+    let x, y;
+    if (side === 0) { x = -20; y = 100 + Math.random() * 400; }
+    else if (side === 1) { x = 620; y = 100 + Math.random() * 400; }
+    else if (side === 2) { x = 100 + Math.random() * 400; y = -20; }
+    else { x = 100 + Math.random() * 400; y = 620; }
+    enemies.push({
+      x, y,
+      vx: 0, vy: 0,
+      r: 16,
+      hp: 2,
+      cooldown: 0,
+      speed: 0.8 + Math.random() * 0.6
+    });
+  }
+  function hitCircle(a, b, ar, br){
+    const d = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
+    return d <= (ar + br) ** 2;
+  }
+
+  let lastSpawn = 0;
+  function loop(){
+    if (state !== 'hud') return;
+    const t = performance.now() / 1000;
+    const dt = Math.min(1/30, 0.03);
+    const m = MISSION_LIST[missionIndex];
+
+    if (t - lastSpawn > 2.5) { spawnEnemy(); lastSpawn = t; }
+
+    const ax = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0) + touchMove.x;
+    const ay = (keys['KeyS'] || keys['ArrowDown'] ? 1 : 0) - (keys['KeyW'] || keys['ArrowUp'] ? 1 : 0) + touchMove.y;
+    const sp = 220 * (charIndex === 3 ? 1.25 : 1);
+    if (ax !== 0 || ay !== 0) {
+      const len = Math.hypot(ax, ay) || 1;
+      player.vx = (ax / len) * sp * dt;
+      player.vy = (ay / len) * sp * dt;
+    } else {
+      player.vx *= 0.85;
+      player.vy *= 0.85;
+    }
+    player.x += player.vx; player.y += player.vy;
+    player.x = Math.max(20, Math.min(580, player.x));
+    player.y = Math.max(20, Math.min(580, player.y));
+
+    if (player.cooldown > 0) player.cooldown--;
+    if (player.abilityCd > 0) player.abilityCd--;
+    if (player.invuln > 0) player.invuln--;
+
+    if (keys[' '] || keys['KeyE']) {
+      if (player.cooldown <= 0) {
+        const dir = Math.atan2(ay || -1, ax || 0);
+        bullets.push({ x: player.x, y: player.y, vx: Math.cos(dir) * 420, vy: Math.sin(dir) * 420, life: 0.6 });
+        if (charIndex === 2) bullets.push({ x: player.x, y: player.y, vx: Math.cos(dir + 0.15) * 380, vy: Math.sin(dir + 0.15) * 380, life: 0.5 });
+        player.cooldown = 12;
+      }
+    }
+
+    bullets.forEach(b => { b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt; });
+    bullets = bullets.filter(b => b.life > 0 && b.x > -20 && b.x < 620 && b.y > -20 && b.y < 620);
+
+    enemies.forEach(e => {
+      const dx = player.x - e.x, dy = player.y - e.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      e.vx = (dx / dist) * e.speed * 80 * dt;
+      e.vy = (dy / dist) * e.speed * 80 * dt;
+      e.x += e.vx; e.y += e.vy;
+      e.cooldown--;
+      bullets.forEach(b => {
+        if (hitCircle(e, b, e.r, 4)) { e.hp--; b.life = 0; particles.push({ x: e.x, y: e.y, life: 0.2 }); }
+      });
+      if (hitCircle(player, e, player.r, e.r) && player.invuln <= 0) {
+        player.hp -= 15;
+        player.invuln = 30;
+        document.getElementById('hud-hp').textContent = Math.max(0, player.hp);
+        if (player.hp <= 0) endMission(false);
+      }
+    });
+    enemies = enemies.filter(e => {
+      if (e.hp <= 0) { particles.push({ x: e.x, y: e.y, life: 0.3 }); return false; }
+      return true;
+    });
+
+    shards.forEach((s, i) => {
+      if (hitCircle(player, s, player.r, s.r)) {
+        shards.splice(i, 1);
+        shardsCollected++;
+        document.getElementById('hud-shards').textContent = shardsCollected;
+        if (m.type === 'shards' && shardsCollected >= m.target) endMission(true);
+      }
+    });
+
+    if (extraction && hitCircle(player, extraction, player.r, extraction.r)) endMission(true);
+    if (m.type === 'time' && t - missionStartTime >= m.target) endMission(true);
+
+    document.getElementById('hud-alert').textContent = t < alertUntil ? alertText : '';
+
+    particles.forEach(p => { p.life -= dt; });
+    particles = particles.filter(p => p.life > 0);
+
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function draw(){
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#05060b';
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(offx, offy);
+    ctx.scale(scale, scale);
+
+    ctx.strokeStyle = 'rgba(0,255,255,.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 600; i += 40) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 600); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(600, i); ctx.stroke();
+    }
+
+    shards.forEach(s => {
+      ctx.fillStyle = '#00ff88';
+      ctx.shadowColor = 'rgba(0,255,136,.6)';
+      ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    if (extraction) {
+      ctx.strokeStyle = 'rgba(0,255,255,.5)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath(); ctx.arc(extraction.x, extraction.y, extraction.r, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    enemies.forEach(e => {
+      ctx.fillStyle = '#ff4466';
+      ctx.shadowColor = 'rgba(255,68,102,.5)';
+      ctx.shadowBlur = 10;
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    bullets.forEach(b => {
+      ctx.fillStyle = '#00ffff';
+      ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI * 2); ctx.fill();
+    });
+
+    particles.forEach(p => {
+      ctx.fillStyle = 'rgba(255,200,100,.8)';
+      ctx.globalAlpha = p.life / 0.3;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    const inv = player.invuln > 0 && Math.floor(player.invuln / 4) % 2 === 0;
+    ctx.fillStyle = inv ? 'rgba(255,255,255,.4)' : '#00ffff';
+    ctx.shadowColor = 'rgba(0,255,255,.6)';
+    ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+  }
+
+  function endMission(won){
+    state = 'dead';
+    document.getElementById('results-title').textContent = won ? 'Mission Complete' : 'Destroyed';
+    document.getElementById('results-sub').textContent = won
+      ? 'Shards: ' + shardsCollected + ' · Well run.'
+      : 'Try again.';
+    show('results');
+  }
+
+  window.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if (e.code === 'Escape') {
+      if (state === 'hud') show('pause');
+      e.preventDefault();
+    }
+  });
+  window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+  const touchEl = document.getElementById('touch');
+  const shootEl = document.getElementById('touch-shoot');
+  if (window.matchMedia('(max-width:768px)').matches) {
+    touchEl.style.display = 'block';
+    if (shootEl) shootEl.style.display = 'block';
+  }
+  let touchId = null, shootId = null;
+  document.addEventListener('pointerdown', e => {
+    if (e.target === touchEl && touchId === null) {
+      touchId = e.pointerId;
+      touchEl.dataset.ox = e.clientX;
+      touchEl.dataset.oy = e.clientY;
+    }
+    if (e.target === shootEl) shootId = e.pointerId;
+  }, true);
+  document.addEventListener('pointermove', e => {
+    if (e.pointerId === touchId && touchEl.dataset.ox) {
+      const dx = (e.clientX - +touchEl.dataset.ox) / 80;
+      const dy = (e.clientY - +touchEl.dataset.oy) / 80;
+      touchMove.x = Math.max(-1, Math.min(1, dx));
+      touchMove.y = Math.max(-1, Math.min(1, dy));
+    }
+  }, true);
+  document.addEventListener('pointerup', e => {
+    if (e.pointerId === touchId) { touchId = null; touchMove.x = 0; touchMove.y = 0; }
+    if (e.pointerId === shootId) { shootId = null; keys[' '] = false; }
+  }, true);
+  document.addEventListener('pointercancel', e => {
+    if (e.pointerId === touchId) { touchId = null; touchMove.x = 0; touchMove.y = 0; }
+  }, true);
+  if (shootEl) {
+    shootEl.addEventListener('pointerdown', e => { keys[' '] = true; e.preventDefault(); });
+    shootEl.addEventListener('pointerup', e => { keys[' '] = false; });
+    shootEl.addEventListener('pointerleave', e => { keys[' '] = false; });
+  }
+})();
+</script>
+</body>
+</html>

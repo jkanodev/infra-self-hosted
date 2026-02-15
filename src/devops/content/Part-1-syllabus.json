@@ -1,0 +1,26 @@
+{
+  "title": "Part 1 — Foundations",
+  "slug": "part-1",
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Linux & Shell",
+      "lessons": [
+        { "id": "l1", "title": "Files and directories", "content": "Learn basic navigation: ls, cd, pwd. Files live in a tree. Use ls -la to see permissions and ownership." },
+        { "id": "l2", "title": "Pipes and redirects", "content": "stdin, stdout, stderr. Use | to chain commands. Use > and >> to redirect output to files." }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Containers",
+      "lessons": [
+        { "id": "l3", "title": "What is a container?", "content": "Containers package an app and its dependencies. They share the host kernel but have isolated filesystem and process space." },
+        { "id": "l4", "title": "Docker basics", "content": "docker run, docker build, Dockerfile. Images are layers; containers are running instances of an image." }
+      ]
+    }
+  ],
+  "quiz": [
+    { "question": "What does ls -la show?", "options": ["Only file names", "Files with permissions and ownership", "Only directories"], "correct": 1 },
+    { "question": "Containers share the host's _____?", "options": ["Filesystem", "Kernel", "User accounts"], "correct": 1 }
+  ]
+}
