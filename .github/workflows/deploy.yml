@@ -55,12 +55,22 @@ jobs:
     if: success()
 
     steps:
+      # If SSH times out (e.g. dial tcp: i/o timeout), check: (1) Router port forwarding
+      # WAN 22 -> SERVER_LAN_IP:22 and WAN 80 -> SERVER_LAN_IP:80. (2) UFW allows 22/tcp.
+      # If your ISP blocks inbound port 22, consider switching to Tailscale-based deployment
+      # (runner and server on Tailnet, use Tailscale IP as HOST and ensure auth is configured).
+      - name: Show SSH Target
+        run: |
+          echo "Deploying to ${{ secrets.HOST }}"
+          timeout 5 bash -c "cat < /dev/null > /dev/tcp/${{ secrets.HOST }}/22" && echo "Port 22 reachable" || echo "Port 22 NOT reachable"
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
+          host: ${{ secrets.HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 120s
           script: |
             set -e
             echo "Pulling latest image..."
